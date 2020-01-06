@@ -1,0 +1,50 @@
+{
+  "name": "ar-upload",
+  "version": "1.0.0",
+  "description": "A library to help uploading many TXs to the Arweave Blockchain.",
+  "main": "index.js",
+  "scripts": {
+    "test": "ts-mocha test/**/*.ts"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "MIT",
+  "@pika/pack": {
+    "pipeline": [
+      [
+        "@pika/plugin-ts-standard-pkg",
+        {
+          "tsconfig": "tsconfig.build.json"
+        }
+      ],
+      [
+        "@pika/plugin-build-node"
+      ],
+      [
+        "@pika/plugin-build-web"
+      ],
+      [
+        "@pika/plugin-build-deno"
+      ]
+    ]
+  },
+  "devDependencies": {
+    "@pika/pack": "^0.5.0",
+    "@pika/plugin-build-deno": "^0.8.1",
+    "@pika/plugin-build-node": "^0.8.1",
+    "@pika/plugin-build-web": "^0.8.1",
+    "@pika/plugin-ts-standard-pkg": "^0.8.1",
+    "@pika/types": "^0.8.1",
+    "@types/chai": "^4.2.7",
+    "@types/mocha": "^5.2.7",
+    "chai": "^4.2.0",
+    "colors": "^1.4.0",
+    "mocha": "^6.2.2",
+    "ts-mocha": "^6.0.0",
+    "typescript": "3.6.3"
+  },
+  "dependencies": {
+    "debug": "^4.1.1",
+    "promises-tho": "^1.1.0"
+  }
+}
