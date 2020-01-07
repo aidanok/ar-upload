@@ -6,6 +6,7 @@ import { Upload, isPending } from "./upload";
 import { TxUpload } from "./tx-upload";
 
 export async function* doUpload(sourceEnv: SourceEnvironment, targetEnv: TargetEnvironment, upload: Upload) {
+  
   const log = debug("do-upload:main");
 
   if (upload.maxPendingBytes < upload.MAX_TX_SIZE) {
@@ -51,6 +52,7 @@ export async function* doUpload(sourceEnv: SourceEnvironment, targetEnv: TargetE
 }
 
 async function moreIntoFlight(sourceEnv: SourceEnvironment, targetEnv: TargetEnvironment, upload: Upload) {
+  
   const toPost: TxUpload[] = [];
   const log = debug("do-upload:add-more");
 
@@ -108,16 +110,6 @@ async function moreIntoFlight(sourceEnv: SourceEnvironment, targetEnv: TargetEnv
     })
   );
 
-  // Free any tx data so it can be GC'ed, it's been posted and we
-  // can retrieve it again if we need to.
-
-  // DONT do this here, since we prefer TXs to keep the same TXID
-  // (use the same anchor) if possible. Instead we clear it when
-  // we get the required number of confirmations.
-
-  //progress.forEach(x => {
-  //  x.transaction = null;
-  //});
 }
 
 async function dedupeAndMutateToMined(sourceEnv: SourceEnvironment, p: TxUpload): Promise<boolean> {

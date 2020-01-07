@@ -2,9 +2,10 @@ import { Options } from "./options";
 import { TxUpload } from "./tx-upload";
 
 /**
- * This is a serializable data structure that holds the current
- * state and options of an Upload. It has a couple of helper methods 
- * for construction and reading data, but does not contain any other logic.
+ * A serializable data structure that holds the current
+ * state and options of an Upload. It has a couple of helper 
+ * methods for construction and reading data, but does not contain 
+ * any other logic.
  * 
  * It can be serialized by calling JSON.stringify() and de-serialized 
  * by calling one of the static fromJSON methods.
