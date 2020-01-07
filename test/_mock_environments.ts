@@ -14,7 +14,7 @@ export class MockSourceEnvironment implements SourceEnvironment {
   randomByteSizeMin = 1024 * 1024 * 0.25;
   randomByteSizeMax = 1024 * 1024 * 10;
 
-  log = debug('post-many:mock-source');
+  log = debug('mock-env:mock-source');
 
   async retrieveTransaction(identifier: string): Promise<TransactionParameters> {
     const data = new ArrayBuffer(Math.random() * (this.randomByteSizeMax - this.randomByteSizeMin) + this.randomByteSizeMin);
@@ -58,7 +58,7 @@ export class MockTargetEnvironment implements TargetEnvironment {
 
   idGen = 97000;
 
-  log = debug('post-many:mock-target')
+  log = debug('mock-env:mock-target')
 
   async postTransaction(transaction: TransactionParameters): Promise<string> {
     this.posted++;
