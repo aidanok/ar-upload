@@ -13,7 +13,7 @@ async function runDemo() {
   options.maxPendingBytes = 50 * 1024 * 1024;
   options.maxPendingTxs = 12;
 
-  const timeScale = 0.1;
+  const timeScale = 0.025;
   const itemCount = 20;
 
   // Make things move a bit faster for demo.
@@ -32,6 +32,8 @@ async function runDemo() {
   console.log(colors.cyan(`Maximum of ${(options.maxPendingBytes / 1024 / 1024).toFixed(2)}MiB or ${options.maxPendingTxs} TXs in-flight at once`));
 
   let progress = new Upload(randomFiles, options); 
+  
+  targetEnv.mineBlocks();
 
   for await (progress of doUpload(sourceEnv, targetEnv, progress)) {
     
@@ -44,6 +46,9 @@ async function runDemo() {
     
     console.log(`Queued:${ql}, Pending:${pl} (${pendingMb} MiB), Mined:${ml}, Completed:${cl}`);
   }
+
+  targetEnv.stopMining();
+
 }
 
 runDemo();

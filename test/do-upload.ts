@@ -5,6 +5,7 @@ import { MockSourceEnvironment, MockTargetEnvironment } from './_mock_environmen
 import { DEFAULT_OPTIONS } from '../src';
 import { Upload } from '../src/upload';
 import { TxUpload } from '../src/tx-upload';
+import { inspect } from 'util';
 
 const expect = chai.expect;
 
@@ -18,7 +19,7 @@ describe('post-many tests', function() {
     const targetEnv = new MockTargetEnvironment(); 
     const options = Object.assign({}, DEFAULT_OPTIONS);
 
-    const timeScale = 0.025;
+    const timeScale = 1//0.025;
     const itemCount = 30;
     
     // Make things move a bit faster for testing.
@@ -27,7 +28,6 @@ describe('post-many tests', function() {
 
     options.maxPendingBytes = 1024 * 1024 * 40;
     options.maxPendingTxs = 10;
-
     
     const identifiers: string[] = [];
 
@@ -42,19 +42,24 @@ describe('post-many tests', function() {
     let queued: TxUpload[] = [];
     let pending: TxUpload[] = [];
     let mined: TxUpload[] = [];
-    let complete: TxUpload[] = [];    
+    let complete: TxUpload[] = [];  
+    let pendingBytes = 0;
 
-    for await ( {queued, pending, mined, complete } of asyncIterator) {
-      const bytesPending = pending.reduce((total, txp) => total += txp.byteSize, 0);
+    targetEnv.mineBlocks();
+
+    for await ( {queued, pending, mined, complete, pendingBytes } of asyncIterator) {
       expect(pending.length).to.be.lte(options.maxPendingTxs);
-      expect(bytesPending).to.be.lte(options.maxPendingBytes);
+      expect(pendingBytes).to.be.lte(options.maxPendingBytes);
     }
 
     expect(queued.length).to.eq(0);
     expect(pending.length).to.eq(0);
     expect(mined.length).to.eq(0);
     expect(complete.length).to.eq(itemCount);
-    complete.forEach(txp => expect(txp.confirmations).to.eq(options.confirmationsRequired));
+    
+    complete.forEach(txupload => expect(txupload.confirmations).to.be.gte(options.confirmationsRequired));
+    
+    targetEnv.stopMining();
 
   })
 })
