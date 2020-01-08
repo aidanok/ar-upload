@@ -4,18 +4,19 @@ Ar-Upload
 Library to help with uploading many transactions and ensure they get confirmed to N confirms
 before finishing.
 
-Has no dependencies on arweave-js or any filesystem, the source and target environment
+No dependencies on arweave-js or filesystem, the source and target environment
 are configured and passed in as configuration, so it can be used in any (JavaScript)
 environment (Browser + Arweave-Js, Browser + Extension, NodeJs FS + Arweave-Js, etc)
 
 Other things...
 
-- Rate limits uploads with quota of MB in-flight and TX count in-flight at once
-- Configurable number of confirms required before finishing
+- Rate limits throughput with quota of MB in-flight and TX count in-flight at once
+- Waits for a configurable number of confirms before finishing.
 - Re-submits TXs that get orphaned before reaching the required number of confirms.
-- Async iterator interface for easy access to progress of upload
+- Async iterator for easy access to progress of upload
 - Progress of upload is serializable at each step, allowing for pause/resume/recovery
 - Optionally provide a deduplication function that gives an already existing TX ID.
+- Can order dependent transactions, so that A is only mined after B, C & D are in a previous block.
 
 Hand wavy example usage:
 

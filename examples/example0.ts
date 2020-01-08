@@ -10,11 +10,11 @@ async function runDemo() {
   const sourceEnv = new MockSourceEnvironment();
   const targetEnv = new MockTargetEnvironment();
   const options = Object.assign({}, DEFAULT_OPTIONS);
-  options.maxPendingBytes = 50 * 1024 * 1024;
+  options.maxPendingBytes = 30 * 1024 * 1024;
   options.maxPendingTxs = 12;
 
-  const timeScale = 0.025;
-  const itemCount = 20;
+  const timeScale = 0.25;
+  const itemCount = 50;
 
   // Make things move a bit faster for demo.
   options.pollTime = options.pollTime * timeScale;

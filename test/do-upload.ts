@@ -9,7 +9,7 @@ import { inspect } from 'util';
 
 const expect = chai.expect;
 
-describe('post-many tests', function() {
+describe('doUpload', function() {
   
   this.timeout(1000*60*500);
 
@@ -19,7 +19,7 @@ describe('post-many tests', function() {
     const targetEnv = new MockTargetEnvironment(); 
     const options = Object.assign({}, DEFAULT_OPTIONS);
 
-    const timeScale = 1//0.025;
+    const timeScale = 0.25;
     const itemCount = 30;
     
     // Make things move a bit faster for testing.

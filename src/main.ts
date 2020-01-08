@@ -2,7 +2,7 @@ import { batch } from "promises-tho";
 import { debug } from "debug";
 import { SourceEnvironment } from "./source-environment";
 import { TargetEnvironment } from "./target-environment";
-import { Upload, isPending } from "./upload";
+import { Upload } from "./upload";
 import { TxUpload } from "./tx-upload";
 
 export async function* doUpload(sourceEnv: SourceEnvironment, targetEnv: TargetEnvironment, upload: Upload) {
@@ -63,9 +63,8 @@ async function moreIntoFlight(sourceEnv: SourceEnvironment, targetEnv: TargetEnv
   );
 
   // This will give us copies to work with for the while loop.
-  // This is not super clear but they are getters on the Upload object which make a copy.
-  // We mutate these shallow copies in the while loop (dequeing and incrementing counts)
-  // and then discard them afterwards.
+  // This is not super clear but they are getters on the Upload object which make a 
+  // shallow copy. 
   const pending = upload.pending;
   const queued = upload.queued;
   let pendingData = upload.pendingBytes;
