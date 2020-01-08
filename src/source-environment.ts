@@ -1,8 +1,9 @@
 import { TransactionParameters } from "./transaction-parameters";
+import { Upload } from "./upload";
 
-export type RetrieveTransaction = (item: string) => Promise<TransactionParameters>;
+export type RetrieveTransaction = (item: string, progress: Upload) => Promise<TransactionParameters>;
 
-export type DeduplicateTransaction = (transaction: TransactionParameters) => Promise<string | undefined>;
+export type DeduplicateTransaction = (item: string, transaction: TransactionParameters) => Promise<string | undefined>;
 
 /**
  * The interface to access the source environment (read)

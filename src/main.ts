@@ -70,7 +70,7 @@ async function moreIntoFlight(sourceEnv: SourceEnvironment, targetEnv: TargetEnv
 
   while (pendingCount < upload.maxPendingTxs && pendingData < upload.maxPendingBytes && queued.length) {
     const next = queued.shift()!;
-    next.transaction = await sourceEnv.retrieveTransaction(next.item);
+    next.transaction = await sourceEnv.retrieveTransaction(next.item, upload);
 
     // Check if we can find an existing txid.
     // If found this we mark it as: 'mined' with -1 confirmations.
@@ -99,7 +99,7 @@ async function moreIntoFlight(sourceEnv: SourceEnvironment, targetEnv: TargetEnv
   await Promise.all(
     toPost.map(async x => {
       if (!x.transaction) {
-        x.transaction = await sourceEnv.retrieveTransaction(x.item);
+        x.transaction = await sourceEnv.retrieveTransaction(x.item, upload);
       }
       const resp = await targetEnv.postTransaction(x.transaction);
       const txId = typeof resp === "string" ? resp : resp.id;
@@ -110,7 +110,7 @@ async function moreIntoFlight(sourceEnv: SourceEnvironment, targetEnv: TargetEnv
 
 async function dedupeAndMutateToMined(sourceEnv: SourceEnvironment, p: TxUpload): Promise<boolean> {
   if (sourceEnv.dedupTransaction && p.transaction) {
-    const existingId = await sourceEnv.dedupTransaction(p.transaction);
+    const existingId = await sourceEnv.dedupTransaction(p.item, p.transaction);
     if (existingId) {
       // Assumed to be mined, but -1 confirms so it's always checked.
       p.status = 200;
