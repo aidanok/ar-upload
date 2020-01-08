@@ -11,7 +11,6 @@ export type DeduplicateTransaction = (transaction: TransactionParameters) => Pro
  * or a combination of things.
  */
 export interface SourceEnvironment {
-
   retrieveTransaction: RetrieveTransaction;
 
   dedupTransaction?: DeduplicateTransaction;

@@ -8,5 +8,4 @@ export interface TxUpload {
   status: number;
   transaction: null | TransactionParameters;
   byteSize: number;
-
 }

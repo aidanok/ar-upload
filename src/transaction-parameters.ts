@@ -10,7 +10,6 @@ export type TransactionId = string;
  *
  */
 export interface TransactionParameters {
-
   /**
    * The target wallet address.
    * Optional if you are only saving data.

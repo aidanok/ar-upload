@@ -7,11 +7,10 @@ export type GetStatus = (id: TransactionId) => Promise<{ status: number; confirm
 /**
  * The interface to access the destination environment (upload)
  *
- * This will usually be an Arweave SDK of some type, such as arweave-js or 
+ * This will usually be an Arweave SDK of some type, such as arweave-js or
  * the extension. It can be an interface to anything.
  */
 export interface TargetEnvironment {
-  
   postTransaction: PostTransaction;
 
   getStatus: GetStatus;

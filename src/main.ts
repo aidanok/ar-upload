@@ -6,7 +6,6 @@ import { Upload } from "./upload";
 import { TxUpload } from "./tx-upload";
 
 export async function* doUpload(sourceEnv: SourceEnvironment, targetEnv: TargetEnvironment, upload: Upload) {
-  
   const log = debug("do-upload:main");
 
   if (upload.maxPendingBytes < upload.MAX_TX_SIZE) {
@@ -34,12 +33,12 @@ export async function* doUpload(sourceEnv: SourceEnvironment, targetEnv: TargetE
     await checkAndMutateStatus(targetEnv, upload.mined);
 
     // Free up memory to be gc'ed for complete transactions.
-    // Un-decided if theres any benefit to keeping around pending/mined tx 
-    // data ... 
+    // Un-decided if theres any benefit to keeping around pending/mined tx
+    // data ...
 
     // upload.pending.forEach(x => x.transaction = null);
     // upload.mined.forEach(x => x.transaction = null);
-    upload.complete.forEach(x => x.transaction = null);
+    upload.complete.forEach(x => (x.transaction = null));
 
     // Give back current state.
     yield upload;
@@ -52,7 +51,6 @@ export async function* doUpload(sourceEnv: SourceEnvironment, targetEnv: TargetE
 }
 
 async function moreIntoFlight(sourceEnv: SourceEnvironment, targetEnv: TargetEnvironment, upload: Upload) {
-  
   const toPost: TxUpload[] = [];
   const log = debug("do-upload:add-more");
 
@@ -63,8 +61,8 @@ async function moreIntoFlight(sourceEnv: SourceEnvironment, targetEnv: TargetEnv
   );
 
   // This will give us copies to work with for the while loop.
-  // This is not super clear but they are getters on the Upload object which make a 
-  // shallow copy. 
+  // This is not super clear but they are getters on the Upload object which make a
+  // shallow copy.
   const pending = upload.pending;
   const queued = upload.queued;
   let pendingData = upload.pendingBytes;
@@ -108,14 +106,13 @@ async function moreIntoFlight(sourceEnv: SourceEnvironment, targetEnv: TargetEnv
       mutateToPending(x, txId);
     })
   );
-
 }
 
 async function dedupeAndMutateToMined(sourceEnv: SourceEnvironment, p: TxUpload): Promise<boolean> {
   if (sourceEnv.dedupTransaction && p.transaction) {
     const existingId = await sourceEnv.dedupTransaction(p.transaction);
     if (existingId) {
-      // Assumed to be mined, but -1 confirms so it's always checked. 
+      // Assumed to be mined, but -1 confirms so it's always checked.
       p.status = 200;
       p.confirmations = -1;
       return true;
