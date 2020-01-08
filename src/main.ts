@@ -70,7 +70,7 @@ async function moreIntoFlight(sourceEnv: SourceEnvironment, targetEnv: TargetEnv
 
   while (pendingCount < upload.maxPendingTxs && pendingData < upload.maxPendingBytes && queued.length) {
     const next = queued.shift()!;
-    next.transaction = await sourceEnv.retrieveTransaction(next.identifier);
+    next.transaction = await sourceEnv.retrieveTransaction(next.item);
 
     // Check if we can find an existing txid.
     // If found this we mark it as: 'mined' with -1 confirmations.
@@ -99,7 +99,7 @@ async function moreIntoFlight(sourceEnv: SourceEnvironment, targetEnv: TargetEnv
   await Promise.all(
     toPost.map(async x => {
       if (!x.transaction) {
-        x.transaction = await sourceEnv.retrieveTransaction(x.identifier);
+        x.transaction = await sourceEnv.retrieveTransaction(x.item);
       }
       const resp = await targetEnv.postTransaction(x.transaction);
       const txId = typeof resp === "string" ? resp : resp.id;

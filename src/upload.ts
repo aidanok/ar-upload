@@ -20,10 +20,10 @@ export class Upload implements Options {
 
   private all: TxUpload[] = [];
 
-  public constructor(identifiers: string[] = [], options: Partial<Options> = {}) {
+  public constructor(items: string[] = [], options: Partial<Options> = {}) {
     Object.assign(this, options);
-    this.all = identifiers.map(identifier => ({
-      identifier,
+    this.all = items.map(item => ({
+      item,
       id: null,
       confirmations: -1,
       status: 404,
@@ -33,10 +33,10 @@ export class Upload implements Options {
     }));
   }
 
-  public addIdentifiers(identifiers: string[], order = 0) {
+  public additems(items: string[], order = 0) {
     this.all.push(
-      ...identifiers.map(identifier => ({
-        identifier,
+      ...items.map(item => ({
+        item,
         id: null,
         confirmations: -1,
         status: 404,

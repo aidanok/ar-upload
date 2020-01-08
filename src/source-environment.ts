@@ -1,6 +1,6 @@
 import { TransactionParameters } from "./transaction-parameters";
 
-export type RetrieveTransaction = (identifier: string) => Promise<TransactionParameters>;
+export type RetrieveTransaction = (item: string) => Promise<TransactionParameters>;
 
 export type DeduplicateTransaction = (transaction: TransactionParameters) => Promise<string | undefined>;
 

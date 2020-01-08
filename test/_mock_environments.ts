@@ -11,7 +11,7 @@ const randomIntBetween = (min: number, max: number) =>
 
 /**
  * This Mock SourceEnvironment just returns a random chunk of data
- * for any identifier requested.
+ * for any item requested.
  */
 export class MockSourceEnvironment implements SourceEnvironment {
   retrieved = 0;
@@ -22,12 +22,12 @@ export class MockSourceEnvironment implements SourceEnvironment {
 
   log = debug('mock-env:mock-source');
 
-  async retrieveTransaction(identifier: string): Promise<TransactionParameters> {
+  async retrieveTransaction(item: string): Promise<TransactionParameters> {
     const data = new ArrayBuffer(randomIntBetween(this.randomByteSizeMin, this.randomByteSizeMax));
 
     this.retrieved++;
     this.retrievedTotalSize += data.byteLength;
-    // this.log(`Retrieved TX data for identifier: ${identifier}, bytes: ${data.byteLength}`)
+    // this.log(`Retrieved TX data for item: ${item}, bytes: ${data.byteLength}`)
     return {
       data,
       tags: [{ name: "Content-Type", value: "application/octect-stream" }],

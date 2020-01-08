@@ -20,13 +20,13 @@ describe('doUpload', function() {
     const timeScale = 0.25;
     const itemCount = 30;
     
-    const identifiers: string[] = [];
+    const items: string[] = [];
 
     for (let i = 0; i < itemCount; i++) {
-      identifiers.push(`random_file_name_${i}.foo`);
+      items.push(`random_file_name_${i}.foo`);
     }
 
-    let upload = new Upload(identifiers, { maxPendingBytes: 1024 * 1024 * 40, maxPendingTxs: 10});
+    let upload = new Upload(items, { maxPendingBytes: 1024 * 1024 * 40, maxPendingTxs: 10});
 
     // Make things move a bit faster for testing.
     targetEnv.blockTimeSeconds = targetEnv.blockTimeSeconds * timeScale

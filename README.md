@@ -55,5 +55,5 @@ npm run test
 ```
 
 NOTE: The only environments included at the moment are some mock environments for testing, the mock target environment randomly orphans blocks, the mock source environment just provides a randomly sized chunk of bytes
-when asked for any filename/identifier.
+when asked for any filename/item.
 

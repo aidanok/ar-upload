@@ -13,7 +13,7 @@ async function runDemo() {
   const itemCount = 50;
 
   // Set up some random files, the MockSourceEnvironment just gives 
-  // some random bytes for any identifier.
+  // some random bytes for any item.
   const randomFiles: string[] = [];
   for (let i = 0; i < itemCount; i++) {
     randomFiles.push(`random_file_${i}.bin`);

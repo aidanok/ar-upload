@@ -1,7 +1,7 @@
 import { TransactionParameters } from "./transaction-parameters";
 
 export interface TxUpload {
-  identifier: string;
+  item: string;
   order: number;
   id: null | string;
   confirmations: number;
