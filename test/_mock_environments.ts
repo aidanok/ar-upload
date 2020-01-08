@@ -44,10 +44,14 @@ interface MockBlock {
 /**
  * A mock target environment that simulates mining blocks. 
  * We do this so we simulate TX's get orphaned as groups 
- * and for more realistic mock environment. 
+ * for a slighlty more realistic mock environment. 
  * 
  * You need to call mineBlocks() to start the mining loop,
  * and stopMining() to finish it and let the process exit. 
+ * 
+ * This doesn't accurately model mining times, 'blockTimeSeconds' 
+ * is the maximum time it takes to mine a block, rather than 
+ * the average, but this is fine for testing purposes.
  * 
  */
 export class MockTargetEnvironment implements TargetEnvironment {
