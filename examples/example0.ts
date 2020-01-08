@@ -1,24 +1,16 @@
 import { doUpload } from "../src/main";
 import { MockSourceEnvironment, MockTargetEnvironment } from "../test/_mock_environments";
-
 import colors from "colors";
-import { DEFAULT_OPTIONS } from "../src/options";
 import { Upload } from "../src/upload";
 
 async function runDemo() {
 
   const sourceEnv = new MockSourceEnvironment();
   const targetEnv = new MockTargetEnvironment();
-  const options = Object.assign({}, DEFAULT_OPTIONS);
-  options.maxPendingBytes = 30 * 1024 * 1024;
-  options.maxPendingTxs = 12;
-
+  const maxPendingBytes = 30 * 1024 * 1024;
+  const maxPendingTxs = 12;
   const timeScale = 0.25;
   const itemCount = 50;
-
-  // Make things move a bit faster for demo.
-  options.pollTime = options.pollTime * timeScale;
-  targetEnv.blockTimeSeconds = targetEnv.blockTimeSeconds * timeScale;
 
   // Set up some random files, the MockSourceEnvironment just gives 
   // some random bytes for any identifier.
@@ -27,11 +19,15 @@ async function runDemo() {
     randomFiles.push(`random_file_${i}.bin`);
   }
 
-  console.log(colors.cyan(`Simulating ${itemCount} TXs with random sizes`));
-  console.log(colors.cyan(`Waiting for ${options.confirmationsRequired} confirms`));
-  console.log(colors.cyan(`Maximum of ${(options.maxPendingBytes / 1024 / 1024).toFixed(2)}MiB or ${options.maxPendingTxs} TXs in-flight at once`));
+  let progress = new Upload(randomFiles, { maxPendingBytes, maxPendingTxs }); 
 
-  let progress = new Upload(randomFiles, options); 
+  // Make things move a bit faster for demo.
+  progress.pollTime = progress.pollTime * timeScale;
+  targetEnv.blockTimeSeconds = targetEnv.blockTimeSeconds * timeScale;
+
+  console.log(colors.cyan(`Simulating ${itemCount} TXs with random sizes`));
+  console.log(colors.cyan(`Waiting for ${progress.confirmationsRequired} confirms`));
+  console.log(colors.cyan(`Maximum of ${(maxPendingBytes / 1024 / 1024).toFixed(2)}MiB or ${maxPendingTxs} TXs in-flight at once`));  
   
   targetEnv.mineBlocks();
 

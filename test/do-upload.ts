@@ -2,10 +2,9 @@ import chai from 'chai' ;
 
 import { doUpload } from '../src';
 import { MockSourceEnvironment, MockTargetEnvironment } from './_mock_environments';
-import { DEFAULT_OPTIONS } from '../src';
 import { Upload } from '../src/upload';
 import { TxUpload } from '../src/tx-upload';
-import { inspect } from 'util';
+
 
 const expect = chai.expect;
 
@@ -17,17 +16,9 @@ describe('doUpload', function() {
       
     const sourceEnv = new MockSourceEnvironment();
     const targetEnv = new MockTargetEnvironment(); 
-    const options = Object.assign({}, DEFAULT_OPTIONS);
-
+    
     const timeScale = 0.25;
     const itemCount = 30;
-    
-    // Make things move a bit faster for testing.
-    options.pollTime = options.pollTime * timeScale;
-    targetEnv.blockTimeSeconds = targetEnv.blockTimeSeconds * timeScale
-
-    options.maxPendingBytes = 1024 * 1024 * 40;
-    options.maxPendingTxs = 10;
     
     const identifiers: string[] = [];
 
@@ -35,8 +26,12 @@ describe('doUpload', function() {
       identifiers.push(`random_file_name_${i}.foo`);
     }
 
-    let upload = new Upload(identifiers, options);
+    let upload = new Upload(identifiers, { maxPendingBytes: 1024 * 1024 * 40, maxPendingTxs: 10});
 
+    // Make things move a bit faster for testing.
+    targetEnv.blockTimeSeconds = targetEnv.blockTimeSeconds * timeScale
+    upload.pollTime = upload.pollTime * timeScale; 
+    
     const asyncIterator = doUpload(sourceEnv, targetEnv, upload); 
 
     let queued: TxUpload[] = [];
@@ -48,8 +43,8 @@ describe('doUpload', function() {
     targetEnv.mineBlocks();
 
     for await ( {queued, pending, mined, complete, pendingBytes } of asyncIterator) {
-      expect(pending.length).to.be.lte(options.maxPendingTxs);
-      expect(pendingBytes).to.be.lte(options.maxPendingBytes);
+      expect(pending.length).to.be.lte(upload.maxPendingTxs);
+      expect(pendingBytes).to.be.lte(upload.maxPendingBytes);
     }
 
     expect(queued.length).to.eq(0);
@@ -57,7 +52,7 @@ describe('doUpload', function() {
     expect(mined.length).to.eq(0);
     expect(complete.length).to.eq(itemCount);
     
-    complete.forEach(txupload => expect(txupload.confirmations).to.be.gte(options.confirmationsRequired));
+    complete.forEach(txupload => expect(txupload.confirmations).to.be.gte(upload.confirmationsRequired));
     
     targetEnv.stopMining();
 
