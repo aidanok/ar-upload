@@ -43,23 +43,25 @@ describe('doUpload', function() {
     // Serialize
     const serialized = JSON.stringify(upload); 
     
-    // While we are serialized, 
+    // While we are serialized,
     // Mine some blocks, orphan a block, mine some more.  
     targetEnv.mineBlock(5);
     targetEnv.orphanBlocks(1);
     targetEnv.mineBlock(10);
     targetEnv.mineBlock(10);
+  
     // Mine one more empty block so the first batch of 10 now have 2 confirms. 
-    targetEnv.mineBlock(0); 
+    targetEnv.mineBlock(0);
     
-   
-    // De-serialize
+    // De-serialize and do a single iteration, our serialized upload with 
+    // a list of 30 pending items will be checked and updated. 
+    
     upload = Upload.fromJSON(serialized);
     
     expect(upload.pending.length).to.eq(30);
     
     for await (upload of doUpload(sourceEnv, targetEnv, upload)) {
-      break; 
+      break;
     }
 
     expect(upload.mined.length).to.eq(10);      // mined but not enough confirmed
