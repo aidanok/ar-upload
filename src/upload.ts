@@ -50,9 +50,9 @@ export class Upload implements Options {
   // When serializing, we don't want to store the transaction
   // data which could be very large, so just make a copy and
   // overwrite transaction with null.
-  public toJSON(): string {
+  public toJSON() {
     const copy = Object.assign({}, this, { all: this.all.map(x => Object.assign(x, { transaction: null })) });
-    return JSON.stringify(copy);
+    return copy;
   }
 
   public static fromJSON(json: string | Buffer, options?: Partial<Options>): Upload {
