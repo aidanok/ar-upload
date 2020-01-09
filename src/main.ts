@@ -7,15 +7,28 @@ import { TxUpload } from "./tx-upload";
 
 export async function* doUpload(sourceEnv: SourceEnvironment, targetEnv: TargetEnvironment, upload: Upload) {
   const log = debug("do-upload:main");
-
+  
+  log(`starting iterator: ${upload.queued.length}, ${upload.pending.length}, ${upload.mined.length}, ${upload.complete.length}`);
+  
   if (upload.maxPendingBytes < upload.MAX_TX_SIZE) {
     throw new Error(`maxPendingBytes must be at least MAX_TX_SIZE: ${upload.MAX_TX_SIZE}`);
   }
 
   if (upload.mined.length == 0 && upload.pending.length == 0 && upload.queued.length == 0) {
-    // Someone passed in an upload with no work to do.
+    // Passed in an upload with no work to do.
+    // Give back the state and finish the iteration. 
     yield upload;
     return;
+  }
+
+  if (upload.pending.length || upload.mined.length) {
+    // Passed in a job that is being resumed and has some 
+    // pending/mined txs, we check these and give back the latest
+    // state to caller before continuing.
+    log(`Resuming upload with pending or mined TXs to check`);
+    await checkAndMutateStatus(targetEnv, upload.pending);
+    await checkAndMutateStatus(targetEnv, upload.mined);
+    yield upload;
   }
 
   while (true) {
@@ -23,6 +36,8 @@ export async function* doUpload(sourceEnv: SourceEnvironment, targetEnv: TargetE
     await moreIntoFlight(sourceEnv, targetEnv, upload);
 
     // Give back current state.
+    log(`after moveIntoFlight: ${upload.queued.length}, ${upload.pending.length}, ${upload.mined.length}, ${upload.complete.length}`);
+  
     yield upload;
 
     // Delay and check and upate statuses.
