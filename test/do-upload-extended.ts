@@ -110,29 +110,5 @@ describe('doUpload', function() {
 
   })
 
-  it('should check the status of a resumed upload', async () => {
-    const sourceEnv = new MockSourceEnvironment();
-    const targetEnv = new MockTargetEnvironment(); 
-    
-    const timeScale = 0.0125;
-    const itemCount = 30;
-    
-    const items: string[] = [];
-
-    for (let i = 0; i < itemCount; i++) {
-      items.push(`random_file_name_${i}.foo`);
-    }
-
-    let upload = new Upload(items, { maxPendingBytes: 1024 * 1024 * 400, maxPendingTxs: 100 });
-
-    for await (upload of doUpload(sourceEnv, targetEnv, upload)) {
-      break; 
-    }
-
-    expect(upload.pending.length).to.eq(itemCount);
-    
-
-  })
-
   
 })
