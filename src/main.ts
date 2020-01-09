@@ -137,7 +137,7 @@ async function dedupeAndMutateToMined(sourceEnv: SourceEnvironment, p: TxUpload)
 }
 
 function checkAndMutateStatus(targetEnv: TargetEnvironment, posts: TxUpload[]) {
-  return batch({ batchSize: 5, batchDelayMs: 30 }, async (x: TxUpload) => {
+  return batch({ batchSize: 3, batchDelayMs: 250 }, async (x: TxUpload) => {
     const status = await targetEnv.getStatus(x.id!);
 
     if (status.status == 200 && status.confirmed) {
