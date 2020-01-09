@@ -5,11 +5,14 @@ import { MockSourceEnvironment, MockTargetEnvironment } from './_mock_environmen
 import { Upload } from '../src/upload';
 import { TxUpload } from '../src/tx-upload';
 
+/**
+ * Quick completing tests.
+ */
 
 const expect = chai.expect;
 
 describe('doUpload', function() {
-  it('should check the status of a resumed upload', async () => {
+  it('should correctly update the status of a resumed upload', async () => {
     const sourceEnv = new MockSourceEnvironment();
     const targetEnv = new MockTargetEnvironment(); 
     
@@ -26,9 +29,10 @@ describe('doUpload', function() {
 
     // Do an upload where we will post all TXs immediately, then break from the iteration, 
     // mine some of these pending TXs, and do another single iteration 
-    // we should see that we have checked the status of these and moved them into 'mined' state. 
+    // we should see that we have checked the status of these and moved them into 
+    // the correct state. 
 
-    let upload = new Upload(items, { maxPendingBytes: 1024 * 1024 * 400, maxPendingTxs: 100 });
+    let upload = new Upload(items, { confirmationsRequired: 2, maxPendingBytes: 1024 * 1024 * 400, maxPendingTxs: 100 });
 
     for await (upload of doUpload(sourceEnv, targetEnv, upload)) {
       break; 
@@ -39,19 +43,30 @@ describe('doUpload', function() {
     // Serialize
     const serialized = JSON.stringify(upload); 
     
-    // Mine some blocks while we are serialized. 
+    // While we are serialized, 
+    // Mine some blocks, orphan a block, mine some more.  
     targetEnv.mineBlock(5);
+    targetEnv.orphanBlocks(1);
+    targetEnv.mineBlock(10);
+    targetEnv.mineBlock(10);
+    // Mine one more empty block so the first batch of 10 now have 2 confirms. 
+    targetEnv.mineBlock(0); 
     
+   
     // De-serialize
     upload = Upload.fromJSON(serialized);
+    
+    expect(upload.pending.length).to.eq(30);
     
     for await (upload of doUpload(sourceEnv, targetEnv, upload)) {
       break; 
     }
 
-    expect(upload.mined.length).to.eq(5);
-    expect(upload.pending.length).to.eq(25);
+    expect(upload.mined.length).to.eq(10);      // mined but not enough confirmed
+    expect(upload.complete.length).to.eq(10);   // mined with 2 confirms. 
+    expect(upload.pending.length).to.eq(5);     // these never got mined.
+    expect(upload.queued.length).to.eq(5);      // these are the orphaned tx, back in the queue. 
     
-
+    
   })
 })

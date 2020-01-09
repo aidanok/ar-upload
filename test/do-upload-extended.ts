@@ -5,6 +5,9 @@ import { MockSourceEnvironment, MockTargetEnvironment } from './_mock_environmen
 import { Upload } from '../src/upload';
 import { TxUpload } from '../src/tx-upload';
 
+/**
+ * Longer running test runs that have randomized blocks being mined.
+ */
 
 const expect = chai.expect;
 

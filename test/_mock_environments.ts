@@ -119,22 +119,12 @@ export class MockTargetEnvironment implements TargetEnvironment {
 
       if (Math.random() < this.orphanChance) {
         const orphanedBlocksCount = randomIntBetween(1, this.oprhanMaxBlocks);
-        const orphanedBlocks = this.minedBlocks.splice(this.minedBlocks.length - orphanedBlocksCount, orphanedBlocksCount);
-        this.log(`Orphaning ${orphanedBlocksCount} blocks`);
-        this.orphanedTxCount += orphanedBlocks.reduce((total, b) => (total += b.txs.length), 0);
-        this.orphanedTotalBytes += orphanedBlocks.reduce(
-          (total, b) =>
-            (total += b.txs.reduce((totalBytes, tx) => (totalBytes += tx.transaction.data ? tx.transaction.data.byteLength : 0), 0)),
-          0
-        );
-        this.log(`Orphaned totals: ${this.orphanedTxCount} TXs, ${this.orphanedTotalBytes} bytes`);
+        this.orphanBlocks(orphanedBlocksCount);
       }
-
+      
       const txCount = Math.min(this.maxTxsPerBlock, randomIntBetween(0, this.pendingTxs.length * 3));
-
       this.mineBlock(txCount);
 
- 
     }
   }
 
@@ -153,4 +143,18 @@ export class MockTargetEnvironment implements TargetEnvironment {
       txs: txsToMine
     });
   }
+
+  // This can be called directly by tests to advance to a certain state.
+  orphanBlocks(orphanedBlocksCount: number) {
+    const orphanedBlocks = this.minedBlocks.splice(this.minedBlocks.length - orphanedBlocksCount, orphanedBlocksCount);
+    this.log(`Orphaning ${orphanedBlocksCount} blocks`);
+    this.orphanedTxCount += orphanedBlocks.reduce((total, b) => (total += b.txs.length), 0);
+    this.orphanedTotalBytes += orphanedBlocks.reduce(
+      (total, b) =>
+        (total += b.txs.reduce((totalBytes, tx) => (totalBytes += tx.transaction.data ? tx.transaction.data.byteLength : 0), 0)),
+      0
+    );
+    this.log(`Orphaned totals: ${this.orphanedTxCount} TXs, ${this.orphanedTotalBytes} bytes`);
+  }
+
 }
