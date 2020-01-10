@@ -26,8 +26,15 @@ export async function* doUpload(sourceEnv: SourceEnvironment, targetEnv: TargetE
     // pending/mined txs, we check these and give back the latest
     // state to caller before continuing.
     log(`Resuming upload with pending or mined TXs to check`);
+    let minOrder = Number.POSITIVE_INFINITY;
+    upload.pending.forEach(x => minOrder = Math.min(x.order, minOrder));
+    upload.queued.forEach(x => minOrder = Math.min(x.order, minOrder));
+
+    log(`Min order in pending or queued: ${minOrder}`);
     await checkAndMutateStatus(targetEnv, upload.pending);
     await checkAndMutateStatus(targetEnv, upload.mined);
+    // Give back current state.
+    log(`after resume check: ${upload.queued.length}, ${upload.pending.length}, ${upload.mined.length}, ${upload.complete.length}`);
     yield upload;
   }
 
@@ -80,12 +87,24 @@ async function moreIntoFlight(sourceEnv: SourceEnvironment, targetEnv: TargetEnv
   // shallow copy.
   const pending = upload.pending;
   const queued = upload.queued;
+  
+  // Get the minimum 'order' value thats currently in the pending 
+  // or queued list. We only only post items with order > to this 
+  // value. 
+  let minOrder = Number.POSITIVE_INFINITY;
+  pending.forEach(x => minOrder = Math.min(x.order, minOrder));
+  queued.forEach(x => minOrder = Math.min(x.order, minOrder));
+
+  log(`Min order in pending or queued: ${minOrder}`);
   let pendingData = upload.pendingBytes;
   let pendingCount = pending.length;
-
+  
   while (pendingCount < upload.maxPendingTxs && pendingData < upload.maxPendingBytes && queued.length) {
     const next = queued.shift()!;
-    next.transaction = await sourceEnv.retrieveTransaction(next.item, upload);
+    
+    if (next.order > minOrder) {
+      continue;
+    }
 
     // Check if we can find an existing txid.
     // If found this we mark it as: 'mined' with -1 confirmations.
@@ -97,6 +116,8 @@ async function moreIntoFlight(sourceEnv: SourceEnvironment, targetEnv: TargetEnv
 
     // Check if this transaction is too big to put in flight with the current batch
     // and skip it if so.
+    next.transaction = await sourceEnv.retrieveTransaction(next.item, upload);
+
     if (next.transaction.data && next.transaction.data.byteLength + pendingData > upload.maxPendingBytes) {
       continue;
     }
@@ -137,7 +158,7 @@ async function dedupeAndMutateToMined(sourceEnv: SourceEnvironment, p: TxUpload)
 }
 
 function checkAndMutateStatus(targetEnv: TargetEnvironment, posts: TxUpload[]) {
-  return batch({ batchSize: 3, batchDelayMs: 250 }, async (x: TxUpload) => {
+  return batch({ batchSize: 3, batchDelayMs: 30 }, async (x: TxUpload) => {
     const status = await targetEnv.getStatus(x.id!);
 
     if (status.status == 200 && status.confirmed) {

@@ -42,7 +42,7 @@ export class Upload implements Options {
         status: 404,
         transaction: null,
         byteSize: 0,
-        order: 1
+        order: order
       }))
     );
   }
