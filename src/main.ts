@@ -125,7 +125,7 @@ async function moreIntoFlight(sourceEnv: SourceEnvironment, targetEnv: TargetEnv
 
 async function dedupeAndMutateToMined(sourceEnv: SourceEnvironment, p: TxUpload): Promise<boolean> {
   if (sourceEnv.dedupTransaction && p.transaction) {
-    const existingId = await sourceEnv.dedupTransaction(p.item, p.transaction);
+    const existingId = await sourceEnv.dedupTransaction(p.item);
     if (existingId) {
       // Assumed to be mined, but -1 confirms so it's always checked.
       p.status = 200;

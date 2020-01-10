@@ -3,7 +3,7 @@ import { Upload } from "./upload";
 
 export type RetrieveTransaction = (item: string, progress: Upload) => Promise<TransactionParameters>;
 
-export type DeduplicateTransaction = (item: string, transaction: TransactionParameters) => Promise<string | undefined>;
+export type DeduplicateTransaction = (item: string) => Promise<string | undefined>;
 
 /**
  * The interface to access the source environment (read)
